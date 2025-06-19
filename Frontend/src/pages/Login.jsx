@@ -1,50 +1,64 @@
-// src/pages/Login.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+/** @format */
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email === 'admin@ten.com' && password === '123456') {
-      navigate('/dashboard');
-    } else {
-      alert('Invalid credentials');
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email,
+        password,
+      });
+
+      if (res.data.success) {
+        alert("Login successful!");
+        navigate("/dashboard"); // 👈 Redirect here
+      } else {
+        alert(res.data.message || "Login failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong during login");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
-      <div className="w-full max-w-md bg-white/10 border border-gray-700 backdrop-blur-md p-8 rounded-2xl shadow-lg text-white">
-        <h2 className="text-3xl font-bold text-center mb-6">Login to TEN</h2>
-        <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 mb-4 bg-white/10 border border-gray-600 rounded text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 mb-6 bg-white/10 border border-gray-600 rounded text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 transition rounded text-white font-semibold"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+    <div className='min-h-screen flex items-center justify-center bg-gray-900'>
+      <form
+        onSubmit={handleLogin}
+        className='bg-white p-6 rounded shadow-md w-full max-w-sm'
+      >
+        <h2 className='text-2xl mb-4 text-center'>Login</h2>
+        <input
+          type='email'
+          placeholder='Email'
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className='w-full p-2 mb-3 border border-gray-300 rounded'
+          required
+        />
+        <input
+          type='password'
+          placeholder='Password'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className='w-full p-2 mb-3 border border-gray-300 rounded'
+          required
+        />
+        <button
+          type='submit'
+          className='w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700'
+        >
+          Login
+        </button>
+      </form>
     </div>
   );
 };
