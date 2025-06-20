@@ -140,7 +140,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-12 px-8">
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
           <div>
