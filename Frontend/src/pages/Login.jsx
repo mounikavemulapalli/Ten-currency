@@ -24,8 +24,8 @@ const Login = () => {
         alert(res.data.message || "Login failed");
       }
     } catch (err) {
-      console.error(err);
-      alert("Something went wrong during login");
+      console.error("Login error:", err.response ? err.response.data : err.message);
+      alert("Something went wrong during login. Check console for details.");
     }
   };
 

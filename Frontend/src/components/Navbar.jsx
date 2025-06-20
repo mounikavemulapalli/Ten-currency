@@ -1,23 +1,87 @@
-// src/components/Navbar.jsx
-import React from 'react';
-import { Link } from 'react-router-dom';
+/** @format */
+
+// /** @format */
+
+// import React from "react";
+// import { Link } from "react-router-dom";
+// import { useWallet } from "../pages/WalletConnect";
+
+// const Navbar = () => {
+//   const { walletAddress, connectWallet } = useWallet();
+
+//   return (
+//     <nav className='flex items-center justify-between px-6 py-4 bg-gray-900 text-white'>
+//       <div className='text-xl font-bold'>
+//         <Link to='/'>TEN Currency</Link>
+//       </div>
+
+//       <div className='flex items-center gap-4'>
+//         <Link to='/'>Home</Link>
+//         <Link to='/wallet'>Wallet</Link>
+//         <Link to='/exchange'>Exchange</Link>
+//         <Link to='/explorer'>Explorer</Link>
+//         {!walletAddress && (
+//           <>
+//             <Link to='/login'>Login</Link>
+//             <Link to='/signup'>Signup</Link>
+//           </>
+//         )}
+//         <button
+//           onClick={connectWallet}
+//           className='bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700'
+//         >
+//           {walletAddress
+//             ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+//             : "Connect Wallet"}
+//         </button>
+//       </div>
+//     </nav>
+//   );
+// };
+
+// export default Navbar;
+import React from "react";
+import { Link } from "react-router-dom";
+import { useWallet } from "../pages/WalletConnect";
 
 const Navbar = () => {
+  const { walletAddress, balance, tokenBalance, network, connectWallet } =
+    useWallet();
+
   return (
-    <nav className="bg-black text-white px-6 py-4 shadow-md">
-      <div className="flex items-center justify-between max-w-7xl mx-auto">
-        <Link to="/" className="text-2xl font-bold text-green-400">TEN Currency</Link>
+    <nav className='flex items-center justify-between px-6 py-4 bg-gray-900 text-white'>
+      <div className='text-xl font-bold'>
+        <Link to='/'>TEN Currency</Link>
+      </div>
+      <div className='flex items-center gap-4'>
+        <Link to='/'>Home</Link>
+        <Link to='/wallet'>Wallet</Link>
+        <Link to='/exchange'>Exchange</Link>
+        <Link to='/explorer'>Explorer</Link>
+        <Link to='/dashboard'>Dashboard</Link>
+        {!walletAddress && (
+          <>
+            <Link to='/login'>Login</Link>
+            <Link to='/signup'>Signup</Link>
+          </>
+        )}
 
-        <div className="flex gap-6 items-center">
-          <Link to="/wallet" className="hover:text-green-400">Wallet</Link>
-          <Link to="/exchange" className="hover:text-green-400">Exchange</Link>
-          <Link to="/explorer" className="hover:text-green-400">Explorer</Link>
-          <Link to="/dashboard" className="hover:text-green-400">Dashboard</Link>
-        </div>
+        <div className='flex items-center gap-2'>
+          <button
+            onClick={connectWallet}
+            className='bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700'
+          >
+            {walletAddress
+              ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+              : "Connect Wallet"}
+          </button>
 
-        <div className="flex gap-4">
-          <Link to="/login" className="bg-green-600 px-4 py-2 rounded hover:bg-green-700">Login</Link>
-          <Link to="/signup" className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200">Signup</Link>
+          {walletAddress && (
+            <div className='text-sm text-gray-300'>
+              {parseFloat(balance).toFixed(4)} ETH |
+              {parseFloat(tokenBalance).toFixed(2)} USDT |{network}
+            </div>
+          )}
         </div>
       </div>
     </nav>
