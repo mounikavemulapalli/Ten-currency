@@ -32,7 +32,6 @@ const Wallet = () => {
         transition={{ duration: 0.7 }}
         className="bg-white border border-gray-200 shadow-2xl rounded-3xl p-10 max-w-5xl w-full grid md:grid-cols-2 gap-10 items-center"
       >
-        {/* Left side: Image */}
         <div className="flex justify-center">
           <img
             src="https://img.freepik.com/premium-vector/bitcoin-wallet-concept-3d-illustration-icon-composition-with-electronic-wallet-credit-card-coins-cryptocurrency-transaction-trade-bitcoin-mining-vector-illustration-modern-web-design_198565-1848.jpg"
@@ -41,7 +40,6 @@ const Wallet = () => {
           />
         </div>
 
-        {/* Right side: Content */}
         <div className="text-center md:text-left">
           <h2 className="text-4xl font-extrabold text-indigo-700 mb-4">
             Connect Your Wallet
