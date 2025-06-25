@@ -7,6 +7,8 @@ import mongoose from "mongoose";
 import axios from "axios";
 import convertRoute from "./routes/convert.js";
 import authRoutes from "./routes/auth.js";
+import txnRoutes from "./routes/txnRoutes.js";
+import tokenRoutes from "./routes/tokenRoutes.js";
 dotenv.config();
 const app = express();
 app.use(cors());
@@ -41,5 +43,7 @@ mongoose
 
 app.use("/api/convert", convertRoute);
 app.use("/api/auth", authRoutes);
+app.use("/api/txn", txnRoutes);
+app.use("/api/token", tokenRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

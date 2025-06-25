@@ -1,39 +1,5 @@
 /** @format */
 
-// /** @format */
-
-// import { useState, useEffect } from "react";
-
-// export const useWallet = () => {
-//   const [walletAddress, setWalletAddress] = useState("");
-//   const [error, setError] = useState("");
-
-//   const connectWallet = async () => {
-//     if (!window.ethereum) {
-//       setError("MetaMask is not installed");
-//       return;
-//     }
-//     try {
-//       const accounts = await window.ethereum.request({
-//         method: "eth_requestAccounts",
-//       });
-//       setWalletAddress(accounts[0]);
-//       setError("");
-//     } catch (err) {
-//       setError("Could not connect wallet");
-//     }
-//   };
-
-//   useEffect(() => {
-//     if (window.ethereum) {
-//       window.ethereum.on("accountsChanged", (accounts) => {
-//         setWalletAddress(accounts[0] || "");
-//       });
-//     }
-//   }, []);
-
-//   return { walletAddress, connectWallet, error };
-// };
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { ERC20_ABI } from "../abi/erc20";
