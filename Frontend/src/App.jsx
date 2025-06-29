@@ -9,6 +9,9 @@ import Explorer from './pages/Explorer';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import CreateToken from './pages/CreateToken';
+import TokenManager from './pages/TokenManager';
+import PaymentGateway from './pages/PaymentGateway'; 
 
 const App = () => {
   return (
@@ -24,6 +27,9 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/create-token" element={<CreateToken />} />
+            <Route path="/token-manager" element={<TokenManager />} />
+            <Route path="/payment-gateway" element={<PaymentGateway />} />
           </Routes>
         </main>
         <Footer />
