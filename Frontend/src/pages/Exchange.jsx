@@ -38,6 +38,8 @@ const Exchange = () => {
       toast.error("❌ Wallet connection failed.");
     }
   };
+  
+  
 
   const fetchPrices = async () => {
     try {
