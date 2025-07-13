@@ -1,18 +1,15 @@
 /** @format */
-
 import React, { useState, useEffect } from "react";
 
 const TokenCreation = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    symbol: "",
     supply: "",
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null); // 🆕 holds tokenData returned
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [tokens, setTokens] = useState([]); // ✅ new state to hold fetched tokens
+  const [tokens, setTokens] = useState([]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,7 +19,6 @@ const TokenCreation = () => {
     e.preventDefault();
 
     const { supply } = formData;
-
     if (!supply) {
       setError("⚠️ Supply is required.");
       return;
@@ -38,8 +34,8 @@ const TokenCreation = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          decimals: 9, // or let user pick it
-          amount: Number(supply), // backend expects `amount`
+          decimals: 9,
+          amount: Number(supply),
         }),
       });
 
@@ -50,8 +46,8 @@ const TokenCreation = () => {
         return;
       }
 
-      setSubmitted(true);
-      fetchTokens(); // refresh token list
+      setSubmittedData(data.data); // 🆕 Store the returned mint info
+      fetchTokens(); // reload tokens
     } catch (err) {
       console.error("❌ Error creating token:", err);
       setError("❌ Network/server error.");
@@ -60,12 +56,11 @@ const TokenCreation = () => {
     }
   };
 
-  // ✅ Fetch all tokens from the backend
   const fetchTokens = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/token/all");
       const data = await res.json();
-      setTokens(data);
+      setTokens(data.tokens);
     } catch (err) {
       console.error("❌ Error fetching tokens:", err);
     }
@@ -82,25 +77,41 @@ const TokenCreation = () => {
           🚀 Create Your TEN Token
         </h2>
         <p className='text-center text-gray-300'>
-          Define your token's <span className='text-yellow-300'>Name</span>,
-          <span className='text-yellow-300'> Symbol</span>, and
-          <span className='text-yellow-300'> Initial Supply</span> to mint a
-          custom cryptocurrency on the blockchain.
+          Provide an <span className='text-yellow-300'>Initial Supply</span> to
+          deploy a custom token on Solana Devnet.
         </p>
 
-        {submitted ? (
+        {submittedData ? (
           <div className='text-center space-y-4'>
             <p className='text-green-400 text-lg font-semibold'>
               ✅ Token created successfully!
             </p>
-            <p className='text-gray-400 text-sm'>
-              This token has been saved to the backend.
-            </p>
+            <div className='text-sm text-left break-words'>
+              <p>
+                <strong className='text-purple-300'>Mint Address:</strong>{" "}
+                {submittedData.mintAddress}
+              </p>
+              <p>
+                <strong className='text-purple-300'>Token Account:</strong>{" "}
+                {submittedData.tokenAccount}
+              </p>
+              <p>
+                <strong className='text-purple-300'>Tx Hash:</strong>{" "}
+                <a
+                  href={`https://explorer.solana.com/tx/${submittedData.txId}?cluster=devnet`}
+                  target='_blank'
+                  rel='noreferrer'
+                  className='text-blue-400 underline'
+                >
+                  View on Explorer
+                </a>
+              </p>
+            </div>
             <button
               className='mt-4 px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md'
               onClick={() => {
-                setFormData({ name: "", symbol: "", supply: "" });
-                setSubmitted(false);
+                setFormData({ supply: "" });
+                setSubmittedData(null);
               }}
             >
               🔁 Create Another Token
@@ -108,22 +119,6 @@ const TokenCreation = () => {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className='space-y-4'>
-            <input
-              type='text'
-              name='name'
-              placeholder='🔤 Token Name (e.g., TEN Coin)'
-              value={formData.name}
-              onChange={handleChange}
-              className='w-full px-4 py-2 rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-purple-400'
-            />
-            <input
-              type='text'
-              name='symbol'
-              placeholder='🔠 Token Symbol (e.g., TEN)'
-              value={formData.symbol}
-              onChange={handleChange}
-              className='w-full px-4 py-2 rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-purple-400'
-            />
             <input
               type='number'
               name='supply'
@@ -146,8 +141,8 @@ const TokenCreation = () => {
         )}
 
         <div className='mt-6 text-center text-sm text-gray-400'>
-          ⚙️ Tokens you create here are saved in your local backend and can
-          later be connected to payment gateways or explorers.
+          ⚙️ Tokens you create here are stored in MongoDB and deployed on Solana
+          Devnet.
         </div>
       </div>
 
@@ -161,18 +156,25 @@ const TokenCreation = () => {
             {tokens.map((token) => (
               <div
                 key={token._id}
-                className='bg-white/10 p-4 rounded-lg border border-purple-500'
+                className='bg-white/10 p-4 rounded-lg border border-purple-500 break-words'
               >
-                <h4 className='text-lg text-yellow-200 font-semibold'>
-                  {token.name}
-                </h4>
-                <p className='text-gray-300'>
-                  Symbol: <span className='font-mono'>{token.symbol}</span>
+                <p className='text-yellow-200 font-semibold'>Mint Address:</p>
+                <p className='text-gray-300 mb-2 font-mono'>
+                  {token.mintAddress}
                 </p>
-                <p className='text-gray-300'>Supply: {token.supply}</p>
-                <p className='text-xs text-gray-400'>
-                  Created: {new Date(token.createdAt).toLocaleString()}
+                <p className='text-yellow-200 font-semibold'>Token Account:</p>
+                <p className='text-gray-300 mb-2 font-mono'>
+                  {token.tokenAccount}
                 </p>
+                <p className='text-yellow-200 font-semibold'>Tx Hash:</p>
+                <a
+                  href={`https://explorer.solana.com/tx/${token.txHash}?cluster=devnet`}
+                  target='_blank'
+                  rel='noreferrer'
+                  className='text-blue-400 underline break-all'
+                >
+                  {token.txHash}
+                </a>
               </div>
             ))}
           </div>
