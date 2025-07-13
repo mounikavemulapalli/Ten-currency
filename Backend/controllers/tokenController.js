@@ -28,7 +28,7 @@ import Wallet from "../models/Wallet.js";
 import Transaction from "../models/Transaction.js";
 import { v4 as uuidv4 } from "uuid"; // Install with: npm i uuid
 import Token from "../models/token.js"; // ✅ Default import
-
+import TransactionLog from "../models/TransactionLog.js";
 // export const createToken = async (req, res) => {
 //   try {
 //     const { name, symbol, supply } = req.body;
@@ -51,14 +51,45 @@ import Token from "../models/token.js"; // ✅ Default import
 export const createToken = async (req, res) => {
   try {
     const { decimals, amount } = req.body;
+
+    // 🔍 Input validation
+    if (typeof decimals !== "number" || typeof amount !== "number") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid input: 'decimals' and 'amount' must be numbers",
+      });
+    }
+
+    console.log("🚀 Creating token with:", { decimals, amount });
+
+    // 🪙 Deploy token on Solana
     const tokenData = await deployToken({ decimals, amount });
+
+    if (
+      !tokenData?.mintAddress ||
+      !tokenData?.tokenAccount ||
+      !tokenData?.txId
+    ) {
+      throw new Error("Token deployment returned incomplete data");
+    }
+
+    // 📝 Save token transaction log to MongoDB
+    const log = new TransactionLog({
+      mintAddress: tokenData.mintAddress,
+      tokenAccount: tokenData.tokenAccount,
+      txHash: tokenData.txId,
+    });
+
+    const savedLog = await log.save();
+    console.log("✅ Log saved to DB:", savedLog);
 
     res.status(200).json({
       success: true,
-      message: "Token created successfully",
+      message: "Token created and logged successfully",
       data: tokenData,
     });
   } catch (err) {
+    console.error("❌ Error in createToken:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 };
@@ -126,10 +157,9 @@ export const getAllTransactions = async (req, res) => {
 };
 export const getAllTokens = async (req, res) => {
   try {
-    const tokens = await Token.find().sort({ createdAt: -1 }); // newest first
-    res.json(tokens);
+    const tokens = await TransactionLog.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, tokens });
   } catch (err) {
-    console.error("❌ Error fetching tokens:", err);
-    res.status(500).json({ error: "Failed to fetch tokens" });
+    res.status(500).json({ success: false, error: err.message });
   }
 };

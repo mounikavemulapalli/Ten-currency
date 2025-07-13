@@ -20,10 +20,11 @@ const TokenCreation = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, symbol, supply } = formData;
 
-    if (!name || !symbol || !supply) {
-      setError("⚠️ All fields are required.");
+    const { supply } = formData;
+
+    if (!supply) {
+      setError("⚠️ Supply is required.");
       return;
     }
 
@@ -31,15 +32,14 @@ const TokenCreation = () => {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/token", {
+      const res = await fetch("http://localhost:5000/api/token/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name,
-          symbol,
-          supply: Number(supply),
+          decimals: 9, // or let user pick it
+          amount: Number(supply), // backend expects `amount`
         }),
       });
 
@@ -47,13 +47,11 @@ const TokenCreation = () => {
 
       if (!res.ok) {
         setError(data.error || "❌ Token creation failed.");
-        setLoading(false);
         return;
       }
 
-      console.log("✅ Token created:", data);
       setSubmitted(true);
-      fetchTokens(); // ✅ reload tokens after creation
+      fetchTokens(); // refresh token list
     } catch (err) {
       console.error("❌ Error creating token:", err);
       setError("❌ Network/server error.");
@@ -65,7 +63,7 @@ const TokenCreation = () => {
   // ✅ Fetch all tokens from the backend
   const fetchTokens = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/token");
+      const res = await fetch("http://localhost:5000/api/token/all");
       const data = await res.json();
       setTokens(data);
     } catch (err) {
