@@ -1,3 +1,5 @@
+/** @format */
+
 // src/hooks/useWallet.js
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
@@ -31,7 +33,11 @@ export const useWallet = () => {
       setNetwork(netName);
 
       const tokenAddress = USDT_ADDRESS[netName] || USDT_ADDRESS.mainnet;
-      const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+      const tokenContract = new ethers.Contract(
+        tokenAddress,
+        ERC20_ABI,
+        provider
+      );
       const rawTokenBalance = await tokenContract.balanceOf(address);
       const decimals = await tokenContract.decimals();
       const formatted = ethers.formatUnits(rawTokenBalance, decimals);
@@ -51,6 +57,24 @@ export const useWallet = () => {
       setError("MetaMask not installed");
     }
   }, []);
+  const handleConvert = async (symbol, amount) => {
+    const res = await fetch("http://localhost:5000/api/convert/token-to-eth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        address: walletAddress,
+        symbol,
+        amount,
+      }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert(`✅ Converted ${amount} ${symbol} → ${data.ethReceived} ETH`);
+    } else {
+      alert(`❌ ${data.error}`);
+    }
+  };
 
   return {
     walletAddress,
@@ -58,5 +82,6 @@ export const useWallet = () => {
     tokenBalance,
     network,
     error,
+    handleConvert,
   };
 };

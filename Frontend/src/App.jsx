@@ -11,7 +11,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import PaymentGateway from "./pages/PaymentGateway";
-import TokenCreation from "./pages/CreateToken";
+import TokenCreation from "./pages/TokenCreation";
 import TokenManager from "./pages/TokenManager";
 
 const App = () => {
