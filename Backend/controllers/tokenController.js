@@ -29,6 +29,7 @@ import Transaction from "../models/Transaction.js";
 import { v4 as uuidv4 } from "uuid"; // Install with: npm i uuid
 import Token from "../models/token.js"; // ✅ Default import
 import TransactionLog from "../models/TransactionLog.js";
+import { TOKEN_TO_ETH_RATE } from "../utils/conversionRate.js";
 // export const createToken = async (req, res) => {
 //   try {
 //     const { name, symbol, supply } = req.body;
@@ -161,5 +162,41 @@ export const getAllTokens = async (req, res) => {
     res.status(200).json({ success: true, tokens });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
+  }
+};
+export const convertTokenToEth = async (req, res) => {
+  try {
+    const { address, tokenAmount } = req.body;
+
+    if (!address || !tokenAmount) {
+      return res.status(400).json({ msg: "Address and tokenAmount required." });
+    }
+
+    const user = await Wallet.findOne({ address });
+    if (!user) return res.status(404).json({ msg: "Wallet not found." });
+
+    const tokenAmt = parseFloat(tokenAmount);
+    if (user.tokenBalance < tokenAmt) {
+      return res.status(400).json({ msg: "Insufficient token balance." });
+    }
+
+    const ethAmount = tokenAmt * TOKEN_TO_ETH_RATE;
+
+    user.tokenBalance -= tokenAmt;
+    user.ethBalance += ethAmount;
+
+    await user.save();
+
+    res.status(200).json({
+      msg: "✅ Conversion successful!",
+      converted: `${tokenAmt} Tokens → ${ethAmount} ETH`,
+      balances: {
+        token: user.tokenBalance,
+        eth: user.ethBalance,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Conversion error:", err);
+    res.status(500).json({ msg: "Server error." });
   }
 };

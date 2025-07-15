@@ -1,44 +1,67 @@
 /** @format */
 
+// src/pages/Convertsection.jsx
 import React, { useState } from "react";
-import { useWallet } from "../hooks/useWallet";
 
-const ConvertSection = () => {
-  const { walletAddress, balance, handleConvert } = useWallet();
-  const [symbol, setSymbol] = useState("TEN");
-  const [amount, setAmount] = useState(10);
+const Convertsection = ({ address }) => {
+  const [amount, setAmount] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleClick = () => {
-    handleConvert(symbol, amount);
+  const handleConvert = async (e) => {
+    e.preventDefault();
+
+    if (!amount || isNaN(amount)) {
+      setMessage("❌ Enter a valid token amount.");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/token/convert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address, tokenAmount: Number(amount) }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(`❌ ${data.msg || "Conversion failed"}`);
+      } else {
+        setMessage(`✅ ${data.converted}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("❌ Server error.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className='p-4 bg-gray-800 rounded-lg text-white'>
-      <h3 className='text-xl mb-2'>🔁 Convert Tokens to ETH</h3>
-
-      <input
-        type='text'
-        value={symbol}
-        onChange={(e) => setSymbol(e.target.value)}
-        placeholder='Token Symbol (e.g., TEN)'
-        className='mb-2 p-2 rounded text-black'
-      />
-      <input
-        type='number'
-        value={amount}
-        onChange={(e) => setAmount(Number(e.target.value))}
-        placeholder='Amount'
-        className='mb-2 p-2 rounded text-black'
-      />
-
-      <button
-        className='px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded'
-        onClick={handleClick}
-      >
-        Convert to ETH
-      </button>
+    <div className="mt-4">
+      <form onSubmit={handleConvert} className="flex flex-col gap-2">
+        <input
+          type="number"
+          placeholder="Enter token amount to convert"
+          className="w-full p-2 rounded-md text-black"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold"
+          disabled={loading}
+        >
+          {loading ? "🔄 Converting..." : "🔁 Convert Token to ETH"}
+        </button>
+      </form>
+      {message && <p className="mt-2 text-sm text-yellow-300">{message}</p>}
     </div>
   );
 };
 
-export default ConvertSection;
+export default Convertsection;

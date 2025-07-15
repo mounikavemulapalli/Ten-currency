@@ -42,7 +42,7 @@ import convertRoute from "./routes/convert.js";
 import authRoutes from "./routes/auth.js";
 import txnRoutes from "./routes/txnRoutes.js";
 import tokenRoutes from "./routes/tokenRoutes.js";
-
+import walletRoutes from "./routes/walletRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -66,7 +66,7 @@ app.use("/api/convert", convertTokenRoute);
 app.use("/api/auth", authRoutes);
 app.use("/api/txn", txnRoutes);
 app.use("/api/token", tokenRoutes);
-
+app.use("/api/wallet", walletRoutes);
 // ✅ Root test route (optional)
 app.get("/", (req, res) => {
   res.send("🚀 TEN Currency API is running");

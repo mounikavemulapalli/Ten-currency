@@ -1,9 +1,106 @@
+// /** @format */
+
+// import { useState, useEffect } from "react";
+// import { ethers } from "ethers";
+
+// export const useWallet = () => {
+//   const [walletAddress, setWalletAddress] = useState("");
+//   const [balance, setBalance] = useState("");
+//   const [tokenBalance, setTokenBalance] = useState("");
+//   const [network, setNetwork] = useState("");
+//   const [error, setError] = useState("");
+//   const [loading, setLoading] = useState(true);
+
+//   const connectWallet = async () => {
+//     try {
+//       setLoading(true);
+
+//       if (!window.ethereum) {
+//         setError("MetaMask not installed");
+//         return;
+//       }
+
+//       const provider = new ethers.BrowserProvider(window.ethereum);
+//       const accounts = await provider.send("eth_requestAccounts", []);
+//       const signer = await provider.getSigner();
+//       const address = await signer.getAddress();
+//       setWalletAddress(address);
+
+//       const net = await provider.getNetwork();
+//       setNetwork(net.name); // e.g., "sepolia"
+
+//       // ✅ Fetch balances from backend
+//       const res = await fetch(`http://localhost:5000/api/wallet/${address}/full`);
+//       const data = await res.json();
+
+//       if (res.ok) {
+//         setBalance(data.ethBalance ?? "0");
+//         setTokenBalance(data.balance ?? "0");
+//       } else {
+//         setError(data.error || "Failed to fetch wallet data");
+//         setBalance("0");
+//         setTokenBalance("0");
+//       }
+//     } catch (err) {
+//       console.error("❌ Wallet connect error:", err);
+//       setError("Could not connect wallet");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Token → ETH conversion
+//   const handleConvert = async (symbol, amount) => {
+//     try {
+//       const res = await fetch("http://localhost:5000/api/convert/token", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//           address: walletAddress,
+//           symbol,
+//           amount,
+//         }),
+//       });
+
+//       const data = await res.json();
+//       if (res.ok) {
+//         alert(`✅ Converted ${amount} ${symbol} → ${data.ethReceived} ETH`);
+//         connectWallet(); // refresh balances after conversion
+//       } else {
+//         alert(`❌ ${data.error}`);
+//       }
+//     } catch (err) {
+//       console.error("❌ Convert Error:", err);
+//       alert("❌ Network error");
+//     }
+//   };
+
+//   // Auto connect and reload on changes
+//   useEffect(() => {
+//     if (window.ethereum) {
+//       connectWallet();
+//       window.ethereum.on("accountsChanged", () => window.location.reload());
+//       window.ethereum.on("chainChanged", () => window.location.reload());
+//     } else {
+//       setError("MetaMask not installed");
+//     }
+//   }, []);
+
+//   return {
+//     walletAddress,
+//     balance,
+//     tokenBalance,
+//     network,
+//     error,
+//     loading,
+//     handleConvert,
+//     refetchWalletData: connectWallet,
+//   };
+// };
 /** @format */
 
-// src/hooks/useWallet.js
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { ERC20_ABI } from "../abi/erc20";
 
 export const useWallet = () => {
   const [walletAddress, setWalletAddress] = useState("");
@@ -11,70 +108,82 @@ export const useWallet = () => {
   const [tokenBalance, setTokenBalance] = useState("");
   const [network, setNetwork] = useState("");
   const [error, setError] = useState("");
-
-  const USDT_ADDRESS = {
-    mainnet: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT on Ethereum Mainnet
-    goerli: "0xYourTestUSDTTokenAddressHere",
-  };
+  const [loading, setLoading] = useState(true);
 
   const connectWallet = async () => {
     try {
+      setLoading(true);
+
+      if (!window.ethereum) {
+        setError("MetaMask not installed");
+        return;
+      }
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       const accounts = await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
       setWalletAddress(address);
 
-      const rawBalance = await provider.getBalance(address);
-      setBalance(ethers.formatEther(rawBalance));
-
       const net = await provider.getNetwork();
-      const netName = net.name;
-      setNetwork(netName);
+      setNetwork(net.name); // e.g., "sepolia"
 
-      const tokenAddress = USDT_ADDRESS[netName] || USDT_ADDRESS.mainnet;
-      const tokenContract = new ethers.Contract(
-        tokenAddress,
-        ERC20_ABI,
-        provider
-      );
-      const rawTokenBalance = await tokenContract.balanceOf(address);
-      const decimals = await tokenContract.decimals();
-      const formatted = ethers.formatUnits(rawTokenBalance, decimals);
-      setTokenBalance(formatted);
+      // ✅ Fetch balances from backend
+      const res = await fetch(`http://localhost:5000/api/wallet/${address}/full`);
+      const data = await res.json();
+
+      if (res.ok) {
+        setBalance(data.ethBalance ?? "0");
+        setTokenBalance(data.balance ?? "0");
+      } else {
+        setError(data.error || "Failed to fetch wallet data");
+        setBalance("0");
+        setTokenBalance("0");
+      }
     } catch (err) {
-      console.error("Wallet connect error", err);
+      console.error("❌ Wallet connect error:", err);
       setError("Could not connect wallet");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Token → ETH conversion
+  const handleConvert = async (symbol, amount) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/convert/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address: walletAddress,
+          symbol,
+          amount,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(`✅ Converted ${amount} ${symbol} → ${data.ethReceived} ETH`);
+        connectWallet(); // refresh balances after conversion
+      } else {
+        alert(`❌ ${data.error}`);
+      }
+    } catch (err) {
+      console.error("❌ Convert Error:", err);
+      alert("❌ Network error");
+    }
+  };
+
+  // Auto connect and reload on changes
   useEffect(() => {
     if (window.ethereum) {
-      connectWallet(); // Only trigger on mount
+      connectWallet();
       window.ethereum.on("accountsChanged", () => window.location.reload());
       window.ethereum.on("chainChanged", () => window.location.reload());
     } else {
       setError("MetaMask not installed");
     }
   }, []);
-  const handleConvert = async (symbol, amount) => {
-    const res = await fetch("http://localhost:5000/api/convert/token-to-eth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        address: walletAddress,
-        symbol,
-        amount,
-      }),
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      alert(`✅ Converted ${amount} ${symbol} → ${data.ethReceived} ETH`);
-    } else {
-      alert(`❌ ${data.error}`);
-    }
-  };
 
   return {
     walletAddress,
@@ -82,6 +191,8 @@ export const useWallet = () => {
     tokenBalance,
     network,
     error,
+    loading,
     handleConvert,
+    refetchWalletData: connectWallet,
   };
 };

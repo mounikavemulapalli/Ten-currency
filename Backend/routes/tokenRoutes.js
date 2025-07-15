@@ -7,7 +7,7 @@ import {
   getAllTokens,
   getAllTransactions,
 } from "../controllers/tokenController.js";
-
+import { convertTokenToEth } from "../controllers/tokenController.js";
 const router = express.Router();
 
 // POST /api/tokens - Save a new token to DB
@@ -18,5 +18,5 @@ router.get("/transactions", getAllTransactions);
 router.get("/all", getAllTokens);
 // POST /api/tokens/transfer - Transfer token (mock or real)
 router.post("/transfer", transferToken);
-
+router.post("/convert", convertTokenToEth);
 export default router;

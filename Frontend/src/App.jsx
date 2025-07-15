@@ -13,7 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import PaymentGateway from "./pages/PaymentGateway";
 import TokenCreation from "./pages/TokenCreation";
 import TokenManager from "./pages/TokenManager";
-
+import Convertsection from "./pages/Convertsection";
 const App = () => {
   return (
     <Router>
@@ -31,6 +31,7 @@ const App = () => {
             <Route path="/payment-gateway" element={<PaymentGateway />} />
             <Route path="/create-token" element={<TokenCreation />} />
             <Route path="/token-manager" element={<TokenManager />} />
+            <Route path="/convert" element={<Convertsection />} />
           </Routes>
         </main>
         <Footer />

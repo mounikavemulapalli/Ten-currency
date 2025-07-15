@@ -6,6 +6,7 @@ import { useWallet } from "../hooks/useWallet";
 import SendEth from "../pages/SendEth";
 import SendToken from "../pages/SendToken";
 import { FaEthereum, FaNetworkWired, FaCoins, FaHistory, FaUserShield, FaGlobe } from "react-icons/fa";
+import Convertsection from "../pages/Convertsection";
 
 const Dashboard = () => {
   const { walletAddress, balance, tokenBalance, network } = useWallet();
@@ -56,15 +57,19 @@ const Dashboard = () => {
           </div>
 
           {/* Token Holdings */}
-          <div className="bg-white/5 p-6 rounded-2xl border border-purple-600 shadow-lg hover:shadow-purple-800 transition-all duration-300">
-            <h2 className="flex items-center text-xl font-semibold text-purple-300 mb-2">
-              <FaCoins className="mr-2" /> Token Holdings
-            </h2>
-            <div className="text-gray-300 space-y-2 text-md">
-              <p>🪙 USDT: <span className="text-yellow-400">{tokenBalance ? tokenBalance : "--"}</span></p>
-              <p>💎 ETH: <span className="text-blue-400">{balance ? balance : "--"}</span></p>
-            </div>
-          </div>
+        
+<div className="bg-white/5 p-6 rounded-2xl border border-purple-600 shadow-lg hover:shadow-purple-800 transition-all duration-300">
+  <h2 className="flex items-center text-xl font-semibold text-purple-300 mb-2">
+    <FaCoins className="mr-2" /> Token Holdings
+  </h2>
+  <div className="text-gray-300 space-y-2 text-md">
+    <p>🪙 TEN Token: <span className="text-yellow-400">{tokenBalance ?? "--"}</span></p>
+    <p>💎 ETH: <span className="text-blue-400">{balance ?? "--"}</span></p>
+  </div>
+  {/* Add token conversion form here */}
+  {walletAddress && <Convertsection address={walletAddress} />}
+</div>
+
 
           {/* Wallet Info */}
           <div className="bg-white/5 p-6 rounded-2xl border border-purple-600 shadow-lg hover:shadow-purple-800 transition-all duration-300">
