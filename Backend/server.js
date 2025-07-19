@@ -37,7 +37,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import convertTokenRoute from "./routes/convertToken.js";
-// Import routes
+import tokenBalanceRoute from "./routes/tokenBalance.js";
 import convertRoute from "./routes/convert.js";
 import authRoutes from "./routes/auth.js";
 import txnRoutes from "./routes/txnRoutes.js";
@@ -67,6 +67,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/txn", txnRoutes);
 app.use("/api/token", tokenRoutes);
 app.use("/api/wallet", walletRoutes);
+app.use("/api/token", tokenBalanceRoute);
 // ✅ Root test route (optional)
 app.get("/", (req, res) => {
   res.send("🚀 TEN Currency API is running");

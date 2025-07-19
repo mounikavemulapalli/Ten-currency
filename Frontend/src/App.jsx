@@ -1,3 +1,5 @@
+/** @format */
+
 // src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -14,24 +16,30 @@ import PaymentGateway from "./pages/PaymentGateway";
 import TokenCreation from "./pages/TokenCreation";
 import TokenManager from "./pages/TokenManager";
 import Convertsection from "./pages/Convertsection";
+import TokenList from "./pages/TokenList";
+import TransactionList from "./pages/Transactionlist";
+import TransferTokenForm from "./pages/TransferTokenForm";
 const App = () => {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen">
+      <div className='flex flex-col min-h-screen'>
         <Navbar />
-        <main className="flex-grow">
+        <main className='flex-grow'>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/wallet" element={<Wallet />} />
-            <Route path="/exchange" element={<Exchange />} />
-            <Route path="/explorer" element={<Explorer />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/payment-gateway" element={<PaymentGateway />} />
-            <Route path="/create-token" element={<TokenCreation />} />
-            <Route path="/token-manager" element={<TokenManager />} />
-            <Route path="/convert" element={<Convertsection />} />
+            <Route path='/' element={<Home />} />
+            <Route path='/wallet' element={<Wallet />} />
+            <Route path='/exchange' element={<Exchange />} />
+            <Route path='/explorer' element={<Explorer />} />
+            <Route path='/dashboard' element={<Dashboard />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/signup' element={<Signup />} />
+            <Route path='/payment-gateway' element={<PaymentGateway />} />
+            <Route path='/create-token' element={<TokenCreation />} />
+            <Route path='/token-manager' element={<TokenManager />} />
+            <Route path='/convert' element={<Convertsection />} />
+            <Route path='/token' element={<TokenList />} />
+            <Route path='/transactions' element={<TransactionList />} />
+            <Route path='/transfer' element={<TransferTokenForm />} />
           </Routes>
         </main>
         <Footer />

@@ -1,3 +1,5 @@
+/** @format */
+
 // /** @format */
 
 // export const ERC20_ABI = [
@@ -27,8 +29,26 @@
 //   },
 // ];
 
+// export const ERC20_ABI = [
+//   "function balanceOf(address owner) view returns (uint256)",
+//   "function decimals() view returns (uint8)"
+// ];
+import { ethers } from "ethers";
 
-export const ERC20_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
-  "function decimals() view returns (uint8)"
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
+const tokenAddress = "YOUR_ERC20_TOKEN_ADDRESS";
+const walletAddress = await signer.getAddress();
+
+// ERC20 ABI: Minimal version with just balanceOf and decimals
+const abi = [
+  "function balanceOf(address) view returns (uint)",
+  "function decimals() view returns (uint8)",
 ];
+
+const contract = new ethers.Contract(tokenAddress, abi, provider);
+const balance = await contract.balanceOf(walletAddress);
+const decimals = await contract.decimals();
+const formatted = ethers.utils.formatUnits(balance, decimals);
+
+console.log("Token balance:", formatted);
